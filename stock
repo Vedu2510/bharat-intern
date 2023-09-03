@@ -1,0 +1,13 @@
+# Get the predicted stock prices
+predictions = model.predict(X_test)
+predictions = scaler.inverse_transform(predictions)
+
+# Plot the predicted vs. actual stock prices
+plt.figure(figsize=(12, 6))
+plt.title(f"{stock_symbol} Stock Price Prediction")
+plt.xlabel("Date")
+plt.ylabel("Close Price (USD)")
+plt.plot(data.index[-len(y_test):], data['Close'][-len(y_test):], label="Actual Prices")
+plt.plot(data.index[-len(y_test):], predictions, label="Predicted Prices")
+plt.legend()
+plt.show()
