@@ -1,0 +1,37 @@
+import numpy as np
+import tensorflow as tf
+from tensorflow.keras.datasets import mnist
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.utils import to_categorical
+import matplotlib.pyplot as plt
+(X_train, y_train), (X_test, y_test) = mnist.load_data()
+
+X_train = X_train / 255.0
+X_test = X_test / 255.0
+
+y_train = to_categorical(y_train, 10)
+y_test = to_categorical(y_test, 10)
+model = Sequential([
+    Flatten(input_shape=(28, 28)),
+    Dense(128, activation='relu'),
+    Dense(10, activation='softmax')
+])
+
+model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+model.fit(X_train, y_train, epochs=10, batch_size=64, validation_split=0.2)
+test_loss, test_acc = model.evaluate(X_test, y_test)
+print(f"Test accuracy: {test_acc * 100:.2f}%")
+# Example: Predict a digit from an image
+image = X_test[0]
+prediction = model.predict(np.expand_dims(image, axis=0))
+predicted_digit = np.argmax(prediction)
+print(f"Predicted digit: {predicted_digit}")
+# Visualize some test images and their predictions
+num_images = 5
+plt.figure(figsize=(12, 6))
+for i in range(num_images):
+    plt.subplot(1, num_images, i + 1)
+    plt.imshow(X_test[i], cmap='gray')
+    plt.title(f"Predicted: {np.argmax(model.predict(np.expand_dims(X_test[i], axis=0)))}")
+plt.show()
