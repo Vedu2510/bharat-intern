@@ -1,0 +1,60 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import matplotlib.pyplot as plt
+
+# Step 1: Data Preprocessing
+# Load the Titanic dataset
+data = pd.read_csv("https://web.stanford.edu/class/archive/cs/cs109/cs109.1166/stuff/titanic.csv")
+
+# Handle missing values
+data['Age'].fillna(data['Age'].median(), inplace=True)
+data['Embarked'].fillna(data['Embarked'].mode()[0], inplace=True)
+
+# Encode categorical variables (e.g., gender)
+label_encoder = LabelEncoder()
+data['Sex'] = label_encoder.fit_transform(data['Sex'])
+data['Embarked'] = label_encoder.fit_transform(data['Embarked'])
+
+# Define the features and target variable
+X = data[['Pclass', 'Sex', 'Age', 'SibSp', 'Parch', 'Fare', 'Embarked']]
+y = data['Survived']
+
+# Step 2: Data Splitting
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Step 3: Model Building
+model = LogisticRegression()
+
+# Step 4: Model Training
+model.fit(X_train, y_train)
+
+# Step 5: Model Evaluation
+y_pred = model.predict(X_test)
+accuracy = accuracy_score(y_test, y_pred)
+confusion = confusion_matrix(y_test, y_pred)
+report = classification_report(y_test, y_pred)
+
+print(f"Accuracy: {accuracy:.2f}")
+print("Confusion Matrix:")
+print(confusion)
+print("Classification Report:")
+print(report)
+
+# Step 6: Prediction
+# Example prediction for a passenger's features (Pclass, Sex, Age, SibSp, Parch, Fare, Embarked)
+new_passenger = np.array([3, 1, 25, 0, 0, 7.25, 2]).reshape(1, -1)
+survival_prediction = model.predict(new_passenger)
+print(f"Survival Prediction for the new passenger: {'Survived' if survival_prediction[0] == 1 else 'Did not survive'}")
+
+# Step 7: Visualize feature importance (if using another model like Random Forest)
+# If you use a different model like Random Forest, you can visualize feature importance
+# feature_importance = model.feature_importances_
+# feature_names = X.columns
+# plt.barh(feature_names, feature_importance)
+# plt.xlabel('Feature Importance')
+# plt.ylabel('Features')
+# plt.show()
